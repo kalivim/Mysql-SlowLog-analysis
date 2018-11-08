@@ -61,11 +61,11 @@ class AnalysisMysqlSlowLog:
         :param slow_log_file: 需要分析的慢查询日志文件
         :param report_file: 生成报告文件名
         """
-        self.LibToolkit = './pt-query-digest'
+        self.LibToolkit = 'pt-query-digest'
         self.json_file = json_file
         self.report_file = report_file
         self.slow_log_file = slow_log_file
-        self.query_digest = "%s  %s --output json --progress time,1 > %s 2>/dev/null" % (
+        self.query_digest = "perl %s  %s --output json --progress time,1 > %s 2>/dev/null" % (
             self.LibToolkit, slow_log_file, self.json_file)
 
     def general_html_report(self, sql_info):
