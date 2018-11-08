@@ -3,7 +3,9 @@
 ## Usage:
 
 ```shell
-wget https://raw.githubusercontent.com/kalivim/Mysql-SlowLog-analysis/master/analysis-slow-log.py && chmod +x analysis-slow-log.py
+wget https://raw.githubusercontent.com/kalivim/Mysql-SlowLog-analysis/master/analysis-slow-log.py
+
+chmod +x analysis-slow-log.py
 
 ./analysis-slow-log.py Mysql_SlowLog_file general_json_filename report_name
 
