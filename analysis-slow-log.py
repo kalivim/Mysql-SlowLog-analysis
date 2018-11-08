@@ -13,8 +13,14 @@ import sys
 import time
 from jinja2 import Environment, FileSystemLoader
 
-#reload(sys)
-#sys.setdefaultencoding('utf-8')
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
+
+LibToolkit = 'pt-query-digest'
+LibToolkit_url = 'https://github.com/kalivim/Mysql-SlowLog-analysis/raw/master/pt-query-digest'
+HtmlTemplate = 'template.html'
+HtmlTemplate_url = 'https://github.com/kalivim/Mysql-SlowLog-analysis/raw/master/template.html'
+
 
 class RunAndCheckCommand:
 
@@ -61,17 +67,30 @@ class AnalysisMysqlSlowLog:
         :param slow_log_file: 需要分析的慢查询日志文件
         :param report_file: 生成报告文件名
         """
-        self.LibToolkit = 'pt-query-digest'
+        self.LibToolkit = LibToolkit
         self.json_file = json_file
         self.report_file = report_file
         self.slow_log_file = slow_log_file
         self.query_digest = "perl %s  %s --output json --progress time,1 > %s 2>/dev/null" % (
             self.LibToolkit, slow_log_file, self.json_file)
 
+    def check_argv_options(self):
+        get_toolkit = os.path.isfile(HtmlTemplate)
+        get_template = os.path.isfile(LibToolkit)
+        get_slow_log = os.path.isfile(self.slow_log_file)
+        if not get_toolkit:
+            res = RunAndCheckCommand('wget %s 2>/dev/null' % LibToolkit_url, '下载pt-query-digest工具')
+            res.exec_command_stdout_res()
+        if not get_template:
+            res = RunAndCheckCommand('wget %s 2>/dev/null' % HtmlTemplate_url, '下载报告HTML模板')
+            res.exec_command_stdout_res()
+        if not get_slow_log:
+            print("\033[91m [ERROR]>> 指定 %s 慢查询日志不存在  \033[0m" % self.slow_log_file)
+            exit(1)
+
     def general_html_report(self, sql_info):
-        #env = Environment(loader=PackageLoader(os.path.split(os.getcwd())[1]))
         env = Environment(loader=FileSystemLoader(os.path.dirname(__file__)))
-        template = env.get_template('template.html')
+        template = env.get_template(HtmlTemplate)
         html_content = template.render(sql_info=sql_info)
         with open(self.report_file, 'wa') as f:
             f.write(html_content.encode('utf-8'))
@@ -81,6 +100,7 @@ class AnalysisMysqlSlowLog:
         调用第三方工具pt-query-digest生成json报告,并获取需要信息
         :return: digest slow_log format to json
         """
+        self.check_argv_options()
         RunCommandsOBJ = RunAndCheckCommand(self.query_digest, '生成Json报告')
         RunCommandsOBJ.exec_command_stdout_res()
         f = open(self.json_file, 'ra')
@@ -117,8 +137,22 @@ class AnalysisMysqlSlowLog:
 
             all_sql_info.append(sql_info)
             all_sql_info = sorted(all_sql_info, key=lambda e: float(e['query_time_95']), reverse=True)
-            #print(all_sql_info.__getitem__(0))
-        self.general_html_report(all_sql_info)
+        return all_sql_info
+
+
+class SendReportForEmail:
+    pass
+
+
+def help_msg():
+    """
+    输出帮助信息
+    """
+    msg = """
+    Usage:
+        ./ slow-query-analysis.py 慢查询日志 生成json报告文件名 生成html报告文件名
+    """
+    print(msg)
 
 
 if __name__ == "__main__":
@@ -126,8 +160,9 @@ if __name__ == "__main__":
         slow_log_name = sys.argv[1]
         json_file_name = sys.argv[2]
         report_name = sys.argv[3]
+        print('\033[92m ====开始分析慢查询日志==== \033[0m')
         obj = AnalysisMysqlSlowLog(slow_log_file=slow_log_name, json_file=json_file_name, report_file=report_name)
-        obj.general_json_slow_log_report()
+        res_json_report = obj.general_json_slow_log_report()
+        obj.general_html_report(res_json_report)
     else:
-       pass
-
+        help_msg()
