@@ -21,6 +21,8 @@ LibToolkit_url = 'https://github.com/kalivim/Mysql-SlowLog-analysis/raw/master/p
 HtmlTemplate = 'template.html'
 HtmlTemplate_url = 'https://github.com/kalivim/Mysql-SlowLog-analysis/raw/master/template.html'
 
+#检测极赖
+os.system('rpm -q perl-Digest-MD5 || yum -y -q install perl-Digest-MD5')
 
 class RunAndCheckCommand:
 
