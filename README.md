@@ -1,5 +1,7 @@
 # Python调用pt-query-digest分析Mysql慢查询生成html
 
+![报告](https://kionf.com/article_images/slowlog-report-01.jpg)
+
 ## Usage:
 
 ```shell
