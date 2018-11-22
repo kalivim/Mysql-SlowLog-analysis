@@ -38,7 +38,7 @@ class RunAndCheckCommand:
         if self.exp_code == self.ret_code:
             print("\033[92m [INFO]>> %s  \033[0m" % self.task_name)
         else:
-            print("\033[91m [ERROR]>> %s %s  \033[0m" % (self.task_name, self.stderr))
+            print("\033[91m [ERROR]>> %s \033[0m" % self.task_name)
             exit(1)
 
     def exec_command_stdout_res(self):
@@ -47,7 +47,6 @@ class RunAndCheckCommand:
         :return:
         """
         command_res = subprocess.Popen(self.commands, shell=True)
-        self.stderr = command_res.stderr
         while command_res.poll():
             line = command_res.stdout.readline()
             line.strip()
