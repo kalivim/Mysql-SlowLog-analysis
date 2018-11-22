@@ -71,7 +71,7 @@ class AnalysisMysqlSlowLog:
         self.json_file = json_file
         self.report_file = report_file
         self.slow_log_file = slow_log_file
-        self.query_digest = "perl %s  %s --output json --progress time,1 > %s 2>/dev/null" % (
+        self.query_digest = "perl %s  %s --output json --progress time,1 > %s" % (
             self.LibToolkit, slow_log_file, self.json_file)
 
     def check_argv_options(self):
